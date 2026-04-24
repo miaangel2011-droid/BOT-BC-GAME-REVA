@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>🐔 BC.Game Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #07080f;
+  --surface: #0e1019;
+  --surface2: #141620;
+  --surface3: #1a1d2a;
+  --border: #1f2235;
+  --gold: #f5c842;
+  --gold2: #e8a800;
+  --cyan: #00d4ff;
+  --green: #00e676;
+  --red: #ff1744;
+  --orange: #ff6d00;
+  --purple: #7c4dff;
+  --text: #dde2f5;
+  --muted: #5a6080;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* ── TABS ── */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.tab {
+  flex: 1;
+  padding: 12px 4px;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+.tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+
+.page { display: none; padding: 12px; }
+.page.active { display: block; }
+
+/* ── HEADER ── */
+.hero {
+  background: linear-gradient(135deg, #0e0c00 0%, #1a1200 50%, #0e0c00 100%);
+  border: 1px solid rgba(245,200,66,0.2);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(245,200,66,0.08) 0%, transparent 60%);
+}
+.hero-row { display: flex; justify-content: space-between; align-items: center; position: relative; }
+.hero-left h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(245,200,66,0.5);
+  letter-spacing: 2px;
+}
+.hero-left p { font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-top: 2px; }
+.hero-chicken { font-size: 44px; animation: chickenRun 0.6s steps(2) infinite; }
+@keyframes chickenRun { 0% { transform: scaleX(1) translateY(0); } 50% { transform: scaleX(-1) translateY(-2px); } }
+
+.balance-display {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  position: relative;
+}
+.bal-item { text-align: center; }
+.bal-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 15px;
+  font-weight: 700;
+}
+.bal-lbl { font-size: 9px; color: var(--muted); letter-spacing: 1px; margin-top: 2px; }
+
+/* ── QUICK LOG ── */
+.quick-section { margin-bottom: 12px; }
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--cyan);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border), transparent); }
+
+/* MULT QUICK BUTTONS */
+.mult-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.mult-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+.mult-btn:active { transform: scale(0.92); }
+.mult-btn.selected {
+  border-color: var(--gold);
+  background: rgba(245,200,66,0.12);
+  box-shadow: 0 0 12px rgba(245,200,66,0.2);
+}
+.mult-btn .mv {
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.mult-btn .ml { font-size: 8px; color: var(--muted); margin-top: 2px; }
+
+/* CUSTOM MULT */
+.custom-mult-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.custom-mult-row input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 18px;
+  padding: 12px 14px;
+  outline: none;
+  text-align: center;
+}
+.custom-mult-row input:focus { border-color: var(--gold); }
+.custom-mult-row input::placeholder { color: var(--muted); font-size: 12px; }
+
+/* RESULT BUTTONS */
+.result-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.rbtn {
+  padding: 18px;
+  border-radius: 14px;
+  border: none;
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.rbtn:active { transform: scale(0.96); }
+.rbtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+.rbtn-win {
+  background: linear-gradient(135deg, #00c853, #00e676);
+  color: #001a0d;
+  box-shadow: 0 6px 24px rgba(0,230,118,0.35);
+}
+.rbtn-lose {
+  background: linear-gradient(135deg, #d50000, #ff1744);
+  color: #fff;
+  box-shadow: 0 6px 24px rgba(255,23,68,0.35);
+}
+
+/* ── ADVICE CARD ── */
+.advice-mega {
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  border: 2px solid;
+}
+.advice-mega.go {
+  background: linear-gradient(135deg, rgba(0,230,118,0.12), rgba(0,230,118,0.04));
+  border-color: var(--green);
+  box-shadow: 0 0 30px rgba(0,230,118,0.15), inset 0 0 60px rgba(0,230,118,0.04);
+}
+.advice-mega.stop {
+  background: linear-gradient(135deg, rgba(255,23,68,0.12), rgba(255,23,68,0.04));
+  border-color: var(--red);
+  box-shadow: 0 0 30px rgba(255,23,68,0.15);
+}
+.advice-mega.caution {
+  background: linear-gradient(135deg, rgba(245,200,66,0.12), rgba(245,200,66,0.04));
+  border-color: var(--gold);
+  box-shadow: 0 0 30px rgba(245,200,66,0.15);
+}
+.advice-icon { font-size: 56px; margin-bottom: 8px; display: block; }
+.advice-mega.go .advice-icon { animation: goShake 0.5s ease-in-out infinite alternate; }
+@keyframes goShake { from { transform: rotate(-5deg) scale(1); } to { transform: rotate(5deg) scale(1.1); } }
+.advice-mega.stop .advice-icon { animation: stopPulse 0.8s ease-in-out infinite; }
+@keyframes stopPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(0.9); } }
+
+.advice-headline {
+  font-family: 'Orbitron', monospace;
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin-bottom: 6px;
+}
+.advice-mega.go .advice-headline { color: var(--green); text-shadow: 0 0 20px rgba(0,230,118,0.7); }
+.advice-mega.stop .advice-headline { color: var(--red); text-shadow: 0 0 20px rgba(255,23,68,0.7); }
+.advice-mega.caution .advice-headline { color: var(--gold); text-shadow: 0 0 20px rgba(245,200,66,0.7); }
+.advice-sub { font-size: 13px; color: #8899bb; line-height: 1.5; margin-bottom: 10px; }
+.advice-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,212,255,0.1);
+  border: 1px solid rgba(0,212,255,0.25);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  color: var(--cyan);
+}
+
+/* ── STATS PAGE ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.gold::before { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.stat-card.green::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+.stat-card.red::before { background: linear-gradient(90deg, transparent, var(--red), transparent); }
+.stat-card.cyan::before { background: linear-gradient(90deg, transparent, var(--cyan), transparent); }
+.stat-card.purple::before { background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+
+.stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.stat-card.gold .stat-val { color: var(--gold); }
+.stat-card.green .stat-val { color: var(--green); }
+.stat-card.red .stat-val { color: var(--red); }
+.stat-card.cyan .stat-val { color: var(--cyan); }
+.stat-card.purple .stat-val { color: var(--purple); }
+.stat-name { font-size: 10px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+.stat-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* CHART */
+.chart-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.chart-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+canvas { width: 100% !important; height: 120px !important; }
+
+/* STREAK */
+.streak-bar {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.streak-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+}
+.streak-dot.w { background: rgba(0,230,118,0.2); border: 1px solid rgba(0,230,118,0.4); color: var(--green); }
+.streak-dot.l { background: rgba(255,23,68,0.2); border: 1px solid rgba(255,23,68,0.4); color: var(--red); }
+
+/* MULT HEATMAP */
+.heatmap-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+.heatmap-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.heatmap-row:last-child { border-bottom: none; }
+.hm-range { font-family: 'Orbitron', monospace; font-size: 11px; color: var(--gold); }
+.hm-bar-wrap { flex: 1; margin: 0 10px; height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+.hm-bar { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.hm-count { color: var(--muted); font-size: 10px; min-width: 30px; text-align: right; }
+
+/* ── HISTORY PAGE ── */
+.hist-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.hist-filter {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+}
+.hist-list { display: flex; flex-direction: column; gap: 6px; }
+.hist-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 28px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+.hist-item.win { border-left: 3px solid var(--green); }
+.hist-item.lose { border-left: 3px solid var(--red); }
+.hist-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px;
+  color: var(--muted);
+}
+.hist-mult {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  font-weight: 700;
+}
+.hist-item.win .hist-mult { color: var(--green); }
+.hist-item.lose .hist-mult { color: var(--red); }
+.hist-pnl {
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+}
+.hist-time { font-size: 9px; color: var(--muted); }
+
+/* ── SETTINGS PAGE ── */
+.settings-group { margin-bottom: 16px; }
+.setting-row {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.setting-label { font-size: 13px; color: var(--text); }
+.setting-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.setting-row input[type=number], .setting-row select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  padding: 8px 10px;
+  outline: none;
+  width: 100px;
+  text-align: right;
+}
+.setting-row input[type=number]:focus, .setting-row select:focus { border-color: var(--gold); }
+
+/* DANGER ZONE */
+.danger-btn {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255,23,68,0.1);
+  border: 1px solid rgba(255,23,68,0.3);
+  border-radius: 10px;
+  color: var(--red);
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+.danger-btn:active { background: rgba(255,23,68,0.2); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  color: var(--gold);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  z-index: 200;
+  transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* CONFIRM MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.modal-overlay.show { opacity: 1; pointer-events: all; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px 36px;
+  width: 100%;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+.modal-overlay.show .modal-box { transform: translateY(0); }
+.modal-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 8px;
+  text-align: center;
+}
+.modal-sub { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 20px; }
+.modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-btn {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  font-family: 'Orbitron', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.modal-btn.cancel { background: var(--surface3); color: var(--muted); }
+.modal-btn.confirm { background: var(--red); color: #fff; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* BADGE */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 9px;
+  font-family: 'Orbitron', monospace;
+  letter-spacing: 1px;
+}
+.badge-live { background: rgba(255,23,68,0.2); color: var(--red); border: 1px solid rgba(255,23,68,0.3); }
+.badge-live::before { content: '● '; }
+</style>
+</head>
+<body>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTab('play')" id="tab-play">
+    <span class="tab-icon">⚡</span>JOUER
+  </div>
+  <div class="tab" onclick="switchTab('stats')" id="tab-stats">
+    <span class="tab-icon">📊</span>STATS
+  </div>
+  <div class="tab" onclick="switchTab('history')" id="tab-history">
+    <span class="tab-icon">📋</span>HISTORIQUE
+  </div>
+  <div class="tab" onclick="switchTab('settings')" id="tab-settings">
+    <span class="tab-icon">⚙️</span>RÉGLAGES
+  </div>
+</div>
+
+<!-- ════════════ PAGE PLAY ════════════ -->
+<div class="page active" id="page-play">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-row">
+      <div class="hero-left">
+        <h1>BC.GAME BOT</h1>
+        <p>CHICKEN ROAD TRACKER <span class="badge badge-live">LIVE</span></p>
+      </div>
+      <div class="hero-chicken">🐔</div>
+    </div>
+    <div class="balance-display">
+      <div class="bal-item">
+        <div class="bal-val" id="disp-balance" style="color:var(--gold)">—</div>
+        <div class="bal-lbl">SOLDE</div>
+      </div>
+      <div class="bal-item">
+        <div class="bal-val" id="disp-pnl" style="color:var(--green)">+0.00€</div>
+        <div class="bal-lbl">P&L SESSION</div>
+      </div>
+      <div class="bal-item">
+        <div class="bal-val" id="disp-rounds" style="color:var(--cyan)">0</div>
+        <div class="bal-lbl">ROUNDS</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADVICE -->
+  <div class="advice-mega caution" id="adv-card">
+    <span class="advice-icon" id="adv-icon">🐔</span>
+    <div class="advice-headline" id="adv-headline">PRÊT ?</div>
+    <div class="advice-sub" id="adv-sub">Configure ta session dans ⚙️ puis commence à logger tes rounds !</div>
+    <div class="advice-target" id="adv-target">🎯 En attente de données</div>
+  </div>
+
+  <!-- QUICK LOG -->
+  <div class="quick-section">
+    <div class="section-title">MULTIPLICATEUR ATTEINT</div>
+
+    <div class="mult-grid" id="mult-grid">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="custom-mult-row">
+      <input type="number" id="mult-input" placeholder="Autre valeur ex: 3.50" step="0.01" min="0" oninput="onCustomMult()">
+    </div>
+
+    <div class="result-btns">
+      <button class="rbtn rbtn-win" onclick="logRound('win')">
+        ✅<br><span style="font-size:11px">GAGNÉ</span>
+      </button>
+      <button class="rbtn rbtn-lose" onclick="logRound('lose')">
+        💥<br><span style="font-size:11px">PERDU</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CURRENT STREAK -->
+  <div class="quick-section">
+    <div class="section-title">STREAK EN COURS</div>
+    <div class="streak-bar" id="streak-bar-play"></div>
+  </div>
+
+</div>
+
+<!-- ════════════ PAGE STATS ════════════ -->
+<div class="page" id="page-stats">
+
+  <div class="stats-grid">
+    <div class="stat-card gold">
+      <div class="stat-val" id="s-winrate">—</div>
+      <div class="stat-name">Win Rate</div>
+      <div class="stat-sub" id="s-winrate-sub">—</div>
+    </div>
+    <div class="stat-card cyan">
+      <div class="stat-val" id="s-avgmult">—</div>
+      <div class="stat-name">Mult Moyen</div>
+      <div class="stat-sub">sur les wins</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-val" id="s-bestwin">—</div>
+      <div class="stat-name">Meilleur Gain</div>
+      <div class="stat-sub" id="s-bestwin-sub">—</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-val" id="s-worstloss">—</div>
+      <div class="stat-name">Pire Série Lose</div>
+      <div class="stat-sub">rounds consécutifs</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-val" id="s-beststreak">—</div>
+      <div class="stat-name">Meilleure Série</div>
+      <div class="stat-sub">wins consécutifs</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="stat-val" id="s-roi">—</div>
+      <div class="stat-name">ROI Session</div>
+      <div class="stat-sub" id="s-roi-sub">—</div>
+    </div>
+  </div>
+
+  <!-- BANKROLL CHART -->
+  <div class="chart-wrap">
+    <div class="chart-title">ÉVOLUTION BANKROLL</div>
+    <canvas id="bankroll-chart"></canvas>
+  </div>
+
+  <!-- MULT HEATMAP -->
+  <div class="heatmap-wrap">
+    <div class="section-title">DISTRIBUTION MULTIPLICATEURS</div>
+    <div id="heatmap-content">
+      <div style="color:var(--muted); font-size:12px; text-align:center; padding:16px;">Pas encore de données</div>
+    </div>
+  </div>
+
+  <!-- STREAK VISUAL -->
+  <div class="chart-wrap">
+    <div class="chart-title">HISTORIQUE RÉSULTATS (50 derniers)</div>
+    <div class="streak-bar" id="streak-bar-stats" style="gap:3px;"></div>
+  </div>
+
+</div>
+
+<!-- ════════════ PAGE HISTORY ════════════ -->
+<div class="page" id="page-history">
+  <div class="hist-controls">
+    <select class="hist-filter" id="hist-filter" onchange="renderHistory()">
+      <option value="all">Tous les rounds</option>
+      <option value="win">Gains seulement</option>
+      <option value="lose">Pertes seulement</option>
+    </select>
+    <select class="hist-filter" id="hist-sort" onchange="renderHistory()" style="flex:0.6;">
+      <option value="desc">Plus récent</option>
+      <option value="asc">Plus ancien</option>
+    </select>
+  </div>
+  <div class="hist-list" id="hist-list">
+    <div style="color:var(--muted); text-align:center; padding:30px; font-size:12px;">Aucun round enregistré</div>
+  </div>
+</div>
+
+<!-- ════════════ PAGE SETTINGS ════════════ -->
+<div class="page" id="page-settings">
+
+  <div class="settings-group">
+    <div class="section-title">CONFIGURATION SESSION</div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Solde actuel (€)</div>
+        <div class="setting-sub">Ton solde BC.Game</div>
+      </div>
+      <input type="number" id="cfg-balance" step="0.01" min="0" value="5.69" onchange="saveConfig()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Mise par round (€)</div>
+        <div class="setting-sub">Combien tu mises</div>
+      </div>
+      <input type="number" id="cfg-bet" step="0.01" min="0.01" value="0.30" onchange="saveConfig()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Difficulté</div>
+        <div class="setting-sub">Réglage dans BC.Game</div>
+      </div>
+      <select id="cfg-diff" onchange="saveConfig()">
+        <option value="easy">EASY</option>
+        <option value="medium">MEDIUM</option>
+        <option value="hardcore" selected>HARDCORE</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Stratégie</div>
+        <div class="setting-sub">Objectif multiplicateur</div>
+      </div>
+      <select id="cfg-strat" onchange="saveConfig()">
+        <option value="conservative">Conservatrice 1.3X</option>
+        <option value="balanced" selected>Équilibrée 1.8X</option>
+        <option value="aggressive">Agressive 2.5X</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="section-title">ALERTES AUTOMATIQUES</div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Stop Loss (pertes consécutives)</div>
+        <div class="setting-sub">Alert après N pertes de suite</div>
+      </div>
+      <input type="number" id="cfg-stoploss" step="1" min="1" value="4" onchange="saveConfig()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Stop Loss Bankroll (%)</div>
+        <div class="setting-sub">Alert si bankroll baisse de N%</div>
+      </div>
+      <input type="number" id="cfg-bloss" step="5" min="5" value="30" onchange="saveConfig()">
+    </div>
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">Take Profit (%)</div>
+        <div class="setting-sub">Alert si profit dépasse N%</div>
+      </div>
+      <input type="number" id="cfg-tp" step="5" min="5" value="50" onchange="saveConfig()">
+    </div>
+  </div>
+
+  <div class="settings-group">
+    <div class="section-title">DANGER ZONE</div>
+    <button class="danger-btn" onclick="showModal('reset-session')">🔄 Reset Session (garde historique)</button>
+    <button class="danger-btn" onclick="showModal('reset-all')">🗑️ Effacer TOUT (historique compris)</button>
+  </div>
+
+  <div style="text-align:center; color:var(--muted); font-size:10px; padding: 10px 0 30px; font-family:'Space Mono',monospace;">
+    BC.GAME TRACKER v2.0<br>
+    Données stockées localement sur ton téléphone<br>
+    ⚡ Aucune connexion requise
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title">Confirmer ?</div>
+    <div class="modal-sub" id="modal-sub">Cette action est irréversible.</div>
+    <div class="modal-btns">
+      <button class="modal-btn cancel" onclick="closeModal()">Annuler</button>
+      <button class="modal-btn confirm" onclick="confirmModal()">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════
+const STORAGE_KEY = 'bcgame_tracker_v2';
+const QUICK_MULTS = [1.2, 1.5, 1.8, 2.2, 3.0];
+
+let state = {
+  config: {
+    balance: 5.69,
+    initialBalance: 5.69,
+    bet: 0.30,
+    difficulty: 'hardcore',
+    strategy: 'balanced',
+    stopLossStreak: 4,
+    stopLossBankroll: 30,
+    takeProfit: 50
+  },
+  rounds: [],
+  selectedMult: null,
+  pendingAction: null
+};
+
+const STRAT_TARGETS = {
+  conservative: 1.3,
+  balanced: 1.8,
+  aggressive: 2.5
+};
+
+// ═══════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){}
+}
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    if (d) {
+      const parsed = JSON.parse(d);
+      state.rounds = parsed.rounds || [];
+      if (parsed.config) state.config = { ...state.config, ...parsed.config };
+    }
+  } catch(e){}
+}
+
+// ═══════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'stats') renderStats();
+  if (name === 'history') renderHistory();
+  if (name === 'settings') loadSettingsUI();
+}
+
+// ═══════════════════════════════════════
+//  QUICK MULT BUTTONS
+// ═══════════════════════════════════════
+function renderMultGrid() {
+  const grid = document.getElementById('mult-grid');
+  grid.innerHTML = QUICK_MULTS.map(m => `
+    <div class="mult-btn ${state.selectedMult === m ? 'selected' : ''}" onclick="selectMult(${m})">
+      <div class="mv">${m}X</div>
+      <div class="ml">${getMultLabel(m)}</div>
+    </div>
+  `).join('');
+}
+
+function getMultLabel(m) {
+  if (m < 1.5) return 'SAFE';
+  if (m < 2.0) return 'BON';
+  if (m < 3.0) return 'RISQUÉ';
+  return 'RARE';
+}
+
+function selectMult(m) {
+  state.selectedMult = (state.selectedMult === m) ? null : m;
+  document.getElementById('mult-input').value = '';
+  renderMultGrid();
+}
+
+function onCustomMult() {
+  state.selectedMult = null;
+  renderMultGrid();
+}
+
+function getSelectedMult() {
+  const custom = parseFloat(document.getElementById('mult-input').value);
+  if (!isNaN(custom) && custom > 0) return custom;
+  return state.selectedMult;
+}
+
+// ═══════════════════════════════════════
+//  LOG ROUND
+// ═══════════════════════════════════════
+function logRound(result) {
+  const mult = getSelectedMult() || (result === 'win' ? 1.5 : 0.0);
+  const bet = state.config.bet;
+  let pnl = result === 'win' ? +(bet * mult - bet).toFixed(3) : -bet;
+
+  state.config.balance = +(state.config.balance + pnl).toFixed(3);
+
+  state.rounds.push({
+    result,
+    mult: +mult.toFixed(2),
+    pnl: +pnl.toFixed(3),
+    balance: state.config.balance,
+    ts: Date.now()
+  });
+
+  // Reset selection
+  state.selectedMult = null;
+  document.getElementById('mult-input').value = '';
+  renderMultGrid();
+
+  save();
+  updatePlayPage();
+  updateAdvice();
+
+  const emoji = result === 'win' ? '🎉' : '💥';
+  const sign = pnl >= 0 ? '+' : '';
+  showToast(`${emoji} ${sign}${pnl.toFixed(2)}€  →  Solde: ${state.config.balance.toFixed(2)}€`);
+}
+
+// ═══════════════════════════════════════
+//  UPDATE PLAY PAGE
+// ═══════════════════════════════════════
+function updatePlayPage() {
+  const rounds = state.rounds;
+  const wins = rounds.filter(r => r.result === 'win').length;
+  const pnl = state.config.balance - state.config.initialBalance;
+
+  document.getElementById('disp-balance').textContent = state.config.balance.toFixed(2) + '€';
+  document.getElementById('disp-rounds').textContent = rounds.length;
+
+  const pnlEl = document.getElementById('disp-pnl');
+  pnlEl.textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '€';
+  pnlEl.style.color = pnl >= 0 ? 'var(--green)' : 'var(--red)';
+
+  // Streak dots
+  const streakEl = document.getElementById('streak-bar-play');
+  const last20 = rounds.slice(-20);
+  streakEl.innerHTML = last20.length
+    ? last20.map(r => `<div class="streak-dot ${r.result === 'win' ? 'w' : 'l'}">${r.result === 'win' ? 'W' : 'L'}</div>`).join('')
+    : '<span style="color:var(--muted);font-size:11px;">Joue ton premier round !</span>';
+}
+
+// ═══════════════════════════════════════
+//  ADVICE ENGINE
+// ═══════════════════════════════════════
+function updateAdvice() {
+  const cfg = state.config;
+  const rounds = state.rounds;
+  const total = rounds.length;
+  const wins = rounds.filter(r => r.result === 'win').length;
+  const winRate = total > 0 ? wins / total : null;
+  const pnl = cfg.balance - cfg.initialBalance;
+  const balanceRatio = cfg.balance / cfg.initialBalance;
+  const target = STRAT_TARGETS[cfg.strategy];
+
+  // Current consecutive losses
+  let consLoss = 0;
+  for (let i = rounds.length - 1; i >= 0; i--) {
+    if (rounds[i].result === 'lose') consLoss++;
+    else break;
+  }
+
+  const card = document.getElementById('adv-card');
+  const icon = document.getElementById('adv-icon');
+  const headline = document.getElementById('adv-headline');
+  const sub = document.getElementById('adv-sub');
+  const tgt = document.getElementById('adv-target');
+
+  let mode = 'caution', iconStr = '🐔', headStr = '', subStr = '', tgtStr = '';
+
+  // PRIORITY 1: stop loss streak
+  if (consLoss >= cfg.stopLossStreak) {
+    mode = 'stop';
+    iconStr = '🛑';
+    headStr = 'STOP !';
+    subStr = `${consLoss} défaites de suite ! Arrête-toi, respire. Reprends dans 10 min.`;
+    tgtStr = '⚠️ Série noire détectée';
+  }
+  // PRIORITY 2: bankroll loss
+  else if (balanceRatio < (1 - cfg.stopLossBankroll / 100)) {
+    mode = 'stop';
+    iconStr = '💸';
+    headStr = 'BANKROLL !';
+    subStr = `Tu as perdu plus de ${cfg.stopLossBankroll}% de ton solde. Arrête la session.`;
+    tgtStr = `Solde actuel: ${cfg.balance.toFixed(2)}€`;
+  }
+  // PRIORITY 3: take profit
+  else if (pnl > cfg.initialBalance * cfg.takeProfit / 100) {
+    mode = 'go';
+    iconStr = '💰';
+    headStr = 'RETIRE !';
+    subStr = `+${pnl.toFixed(2)}€ de profit ! Tu as dépassé ton objectif. Encaisse et arrête !`;
+    tgtStr = `🎯 Objectif atteint : +${cfg.takeProfit}%`;
+  }
+  // PRIORITY 4: bet too high
+  else if (cfg.bet / cfg.balance > 0.12) {
+    mode = 'caution';
+    iconStr = '⚠️';
+    headStr = 'MISE HAUTE';
+    subStr = `Ta mise (${cfg.bet}€) = ${Math.round(cfg.bet/cfg.balance*100)}% de ton solde. Réduis à ${(cfg.balance*0.05).toFixed(2)}€`;
+    tgtStr = `💡 Mise recommandée: ${(cfg.balance*0.05).toFixed(2)}€`;
+  }
+  // PRIORITY 5: hardcore + bad winrate
+  else if (cfg.difficulty === 'hardcore' && total >= 5 && winRate < 0.35) {
+    mode = 'stop';
+    iconStr = '🔥';
+    headStr = 'DANGER';
+    subStr = `${Math.round(winRate*100)}% de wins en HARDCORE. Le jeu est contre toi là. Pause !`;
+    tgtStr = `📊 ${wins}W / ${total-wins}L`;
+  }
+  // PRIORITY 6: consecutive wins — stay disciplined
+  else if (total >= 3) {
+    let consWin = 0;
+    for (let i = rounds.length - 1; i >= 0; i--) {
+      if (rounds[i].result === 'win') consWin++;
+      else break;
+    }
+    if (consWin >= 3) {
+      mode = 'caution';
+      iconStr = '🔥';
+      headStr = 'EN FORME !';
+      subStr = `${consWin} wins de suite ! Reste discipliné(e), encaisse à ${target}X et ne sois pas greedy !`;
+      tgtStr = `🎯 Cible : ${target}X — encaisse là !`;
+    } else {
+      mode = 'go';
+      iconStr = '⚡';
+      headStr = 'JOUE !';
+      subStr = `Conditions OK. ${winRate !== null ? Math.round(winRate*100)+'% win rate. ' : ''}Encaisse à ${target}X, pas plus !`;
+      tgtStr = `🎯 Multiplicateur cible : ${target}X`;
+    }
+  }
+  // DEFAULT
+  else {
+    mode = 'go';
+    iconStr = '🐔';
+    headStr = total === 0 ? 'PRÊT ?' : 'JOUE !';
+    subStr = total === 0
+      ? 'Commence à logger tes rounds pour recevoir des conseils personnalisés !'
+      : `Encaisse à ${target}X — stratégie ${cfg.strategy}`;
+    tgtStr = total === 0 ? '⚡ En attente de données' : `🎯 Cible : ${target}X`;
+  }
+
+  card.className = 'advice-mega ' + mode;
+  icon.textContent = iconStr;
+  headline.textContent = headStr;
+  sub.textContent = subStr;
+  tgt.textContent = tgtStr;
+}
+
+// ═══════════════════════════════════════
+//  STATS PAGE
+// ═══════════════════════════════════════
+function renderStats() {
+  const rounds = state.rounds;
+  const total = rounds.length;
+  if (total === 0) {
+    ['s-winrate','s-avgmult','s-bestwin','s-worstloss','s-beststreak','s-roi'].forEach(id => {
+      document.getElementById(id).textContent = '—';
+    });
+    renderStreakBar();
+    renderHeatmap();
+    drawChart();
+    return;
+  }
+
+  const wins = rounds.filter(r => r.result === 'win');
+  const losses = rounds.filter(r => r.result === 'lose');
+  const winRate = wins.length / total;
+  const avgMult = wins.length > 0 ? wins.reduce((s,r) => s + r.mult, 0) / wins.length : 0;
+  const bestWin = wins.length > 0 ? Math.max(...wins.map(r => r.pnl)) : 0;
+  const pnl = state.config.balance - state.config.initialBalance;
+  const roi = (pnl / state.config.initialBalance) * 100;
+
+  // Worst lose streak
+  let worstStreak = 0, cur = 0;
+  rounds.forEach(r => {
+    if (r.result === 'lose') { cur++; worstStreak = Math.max(worstStreak, cur); }
+    else cur = 0;
+  });
+
+  // Best win streak
+  let bestStreak = 0; cur = 0;
+  rounds.forEach(r => {
+    if (r.result === 'win') { cur++; bestStreak = Math.max(bestStreak, cur); }
+    else cur = 0;
+  });
+
+  document.getElementById('s-winrate').textContent = Math.round(winRate*100) + '%';
+  document.getElementById('s-winrate-sub').textContent = `${wins.length}W / ${losses.length}L`;
+  document.getElementById('s-avgmult').textContent = avgMult > 0 ? avgMult.toFixed(2) + 'X' : '—';
+  document.getElementById('s-bestwin').textContent = bestWin > 0 ? '+' + bestWin.toFixed(2) + '€' : '—';
+  document.getElementById('s-bestwin-sub').textContent = bestWin > 0 ? 'meilleur round' : '—';
+  document.getElementById('s-worstloss').textContent = worstStreak || '—';
+  document.getElementById('s-beststreak').textContent = bestStreak || '—';
+  document.getElementById('s-roi').textContent = (roi >= 0 ? '+' : '') + roi.toFixed(1) + '%';
+  document.getElementById('s-roi-sub').textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + '€';
+  document.getElementById('s-roi').style.color = roi >= 0 ? 'var(--green)' : 'var(--red)';
+
+  renderStreakBar();
+  renderHeatmap();
+  drawChart();
+}
+
+function renderStreakBar() {
+  const rounds = state.rounds.slice(-50);
+  const el = document.getElementById('streak-bar-stats');
+  el.innerHTML = rounds.length
+    ? rounds.map(r => `<div class="streak-dot ${r.result === 'win' ? 'w' : 'l'}">${r.result === 'win' ? 'W' : 'L'}</div>`).join('')
+    : '<span style="color:var(--muted);font-size:11px;">Pas encore de données</span>';
+}
+
+function renderHeatmap() {
+  const buckets = [
+    { label: '< 1.3X', min: 0, max: 1.3 },
+    { label: '1.3–1.8X', min: 1.3, max: 1.8 },
+    { label: '1.8–2.5X', min: 1.8, max: 2.5 },
+    { label: '2.5–4.0X', min: 2.5, max: 4.0 },
+    { label: '4.0X+', min: 4.0, max: 999 }
+  ];
+  const wins = state.rounds.filter(r => r.result === 'win');
+  if (wins.length === 0) {
+    document.getElementById('heatmap-content').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px;">Pas encore de données</div>';
+    return;
+  }
+  const counts = buckets.map(b => wins.filter(r => r.mult >= b.min && r.mult < b.max).length);
+  const maxCount = Math.max(...counts, 1);
+  const colors = ['#00e676','#00d4ff','#f5c842','#ff6d00','#ff1744'];
+  document.getElementById('heatmap-content').innerHTML = buckets.map((b, i) => `
+    <div class="heatmap-row">
+      <span class="hm-range">${b.label}</span>
+      <div class="hm-bar-wrap">
+        <div class="hm-bar" style="width:${Math.round(counts[i]/maxCount*100)}%; background:${colors[i]};"></div>
+      </div>
+      <span class="hm-count">${counts[i]}x</span>
+    </div>
+  `).join('');
+}
+
+function drawChart() {
+  const canvas = document.getElementById('bankroll-chart');
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.height = 120 * window.devicePixelRatio;
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+  const W = canvas.offsetWidth, H = 120;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const data = [state.config.initialBalance, ...state.rounds.map(r => r.balance)];
+  if (data.length < 2) {
+    ctx.fillStyle = '#5a6080';
+    ctx.font = '11px Exo 2';
+    ctx.textAlign = 'center';
+    ctx.fillText('Pas assez de données', W/2, H/2);
+    return;
+  }
+
+  const minV = Math.min(...data) * 0.97;
+  const maxV = Math.max(...data) * 1.03;
+  const range = maxV - minV || 1;
+  const px = (i) => (i / (data.length - 1)) * (W - 20) + 10;
+  const py = (v) => H - 16 - ((v - minV) / range) * (H - 24);
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(31,34,53,0.8)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) {
+    const y = 8 + (i / 3) * (H - 24);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+  }
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  const lastVal = data[data.length-1];
+  const isUp = lastVal >= state.config.initialBalance;
+  grad.addColorStop(0, isUp ? 'rgba(0,230,118,0.3)' : 'rgba(255,23,68,0.3)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(data[0]));
+  data.forEach((v, i) => { if(i > 0) ctx.lineTo(px(i), py(v)); });
+  ctx.lineTo(px(data.length-1), H);
+  ctx.lineTo(px(0), H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(data[0]));
+  data.forEach((v, i) => { if(i > 0) ctx.lineTo(px(i), py(v)); });
+  ctx.strokeStyle = isUp ? '#00e676' : '#ff1744';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Baseline
+  ctx.beginPath();
+  ctx.moveTo(10, py(state.config.initialBalance));
+  ctx.lineTo(W-10, py(state.config.initialBalance));
+  ctx.strokeStyle = 'rgba(245,200,66,0.3)';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Last value label
+  const lx = px(data.length-1), ly = py(lastVal);
+  ctx.beginPath();
+  ctx.arc(lx, ly, 4, 0, Math.PI*2);
+  ctx.fillStyle = isUp ? '#00e676' : '#ff1744';
+  ctx.fill();
+  ctx.fillStyle = '#fff';
+  ctx.font = `bold 10px "Orbitron"`;
+  ctx.textAlign = lx > W*0.7 ? 'right' : 'left';
+  ctx.fillText(lastVal.toFixed(2)+'€', lx + (lx > W*0.7 ? -8 : 8), ly - 6);
+}
+
+// ═══════════════════════════════════════
+//  HISTORY PAGE
+// ═══════════════════════════════════════
+function renderHistory() {
+  const filter = document.getElementById('hist-filter').value;
+  const sortDir = document.getElementById('hist-sort').value;
+  let rounds = [...state.rounds];
+
+  if (filter === 'win') rounds = rounds.filter(r => r.result === 'win');
+  if (filter === 'lose') rounds = rounds.filter(r => r.result === 'lose');
+  if (sortDir === 'desc') rounds = rounds.reverse();
+
+  const el = document.getElementById('hist-list');
+  if (rounds.length === 0) {
+    el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:30px;font-size:12px;">Aucun round ici</div>';
+    return;
+  }
+
+  el.innerHTML = rounds.map((r, i) => {
+    const n = sortDir === 'desc' ? state.rounds.length - i : i + 1;
+    const time = new Date(r.ts).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+    const sign = r.pnl >= 0 ? '+' : '';
+    return `
+      <div class="hist-item ${r.result}">
+        <span class="hist-num">#${n}</span>
+        <div>
+          <div class="hist-mult">${r.mult ? r.mult + 'X' : '—'}</div>
+          <div class="hist-time">${time}</div>
+        </div>
+        <span class="hist-pnl" style="color:${r.pnl>=0?'var(--green)':'var(--red)'}">
+          ${sign}${r.pnl.toFixed(2)}€
+        </span>
+        <span style="color:var(--muted);font-size:10px;font-family:'Orbitron',monospace;">
+          ${r.balance.toFixed(2)}€
+        </span>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+//  SETTINGS
+// ═══════════════════════════════════════
+function loadSettingsUI() {
+  const cfg = state.config;
+  document.getElementById('cfg-balance').value = cfg.balance;
+  document.getElementById('cfg-bet').value = cfg.bet;
+  document.getElementById('cfg-diff').value = cfg.difficulty;
+  document.getElementById('cfg-strat').value = cfg.strategy;
+  document.getElementById('cfg-stoploss').value = cfg.stopLossStreak;
+  document.getElementById('cfg-bloss').value = cfg.stopLossBankroll;
+  document.getElementById('cfg-tp').value = cfg.takeProfit;
+}
+
+function saveConfig() {
+  state.config.balance = parseFloat(document.getElementById('cfg-balance').value) || state.config.balance;
+  state.config.bet = parseFloat(document.getElementById('cfg-bet').value) || 0.30;
+  state.config.difficulty = document.getElementById('cfg-diff').value;
+  state.config.strategy = document.getElementById('cfg-strat').value;
+  state.config.stopLossStreak = parseInt(document.getElementById('cfg-stoploss').value) || 4;
+  state.config.stopLossBankroll = parseInt(document.getElementById('cfg-bloss').value) || 30;
+  state.config.takeProfit = parseInt(document.getElementById('cfg-tp').value) || 50;
+  save();
+  updatePlayPage();
+  updateAdvice();
+  showToast('✅ Config sauvegardée');
+}
+
+// ═══════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════
+function showModal(action) {
+  state.pendingAction = action;
+  const titles = {
+    'reset-session': 'Reset la session ?',
+    'reset-all': 'Tout effacer ?'
+  };
+  const subs = {
+    'reset-session': 'Les stats sont remises à zéro, mais l\'historique est conservé.',
+    'reset-all': 'TOUT sera effacé : historique, stats, tout. Irréversible !'
+  };
+  document.getElementById('modal-title').textContent = titles[action];
+  document.getElementById('modal-sub').textContent = subs[action];
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal')) {
+    document.getElementById('modal').classList.remove('show');
+    state.pendingAction = null;
+  }
+}
+function confirmModal() {
+  const action = state.pendingAction;
+  document.getElementById('modal').classList.remove('show');
+  if (action === 'reset-session') {
+    state.config.initialBalance = state.config.balance;
+    save();
+    updatePlayPage();
+    updateAdvice();
+    showToast('🔄 Session réinitialisée');
+  } else if (action === 'reset-all') {
+    state.rounds = [];
+    state.config.initialBalance = state.config.balance;
+    localStorage.removeItem(STORAGE_KEY);
+    save();
+    updatePlayPage();
+    updateAdvice();
+    showToast('🗑️ Tout effacé');
+  }
+  state.pendingAction = null;
+}
+
+// ═══════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════
+function init() {
+  load();
+  renderMultGrid();
+  updatePlayPage();
+  updateAdvice();
+}
+
+init();
+</script>
+</body>
+</html>
